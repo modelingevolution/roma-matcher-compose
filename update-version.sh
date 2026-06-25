@@ -170,6 +170,7 @@ case "$COMMAND" in
         fi
         if set_version "$VERSION_ARG"; then
             [ "$FORMAT" = "json" ] && echo "{\"success\": true, \"version\": \"$VERSION_ARG\"}"
+            exit 0
         else
             [ "$FORMAT" = "json" ] && echo "{\"success\": false, \"error\": \"Failed to set version\"}"
             exit 1
