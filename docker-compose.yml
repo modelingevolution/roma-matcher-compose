@@ -1,0 +1,47 @@
+name: roma-matcher
+
+# Deploy package for the RoMa matcher (Epic 029 · Feature 005).
+#
+# AutoUpdater pulls the pinned Harbor image and runs it; this file never builds.
+# `up -d`:  docker compose -f docker-compose.yml -f docker-compose.x64.yml up -d   # x86_64
+#           docker compose -f docker-compose.yml -f docker-compose.arm64.yml up -d # ARM64
+#
+# `docker compose config` validates on any host; `up` needs an NVIDIA-GPU host with the
+# container runtime registered (the service sets `runtime: nvidia`). Weights (~1.6 GB) are
+# baked into the image — no host weights dir, no runtime provisioning.
+
+services:
+  roma-matcher:
+    image: docker.modelingevolution.com/roma-matcher/roma-matcher:1.0.0
+    container_name: roma-matcher
+    restart: unless-stopped
+
+    # GPU on every target via the legacy runtime (deployment.md GPU row).
+    runtime: nvidia
+
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - ROMA_WEIGHTS_DIR=/models
+      - ROMA_DEVICE=cuda
+      - ROMA_HOST=0.0.0.0
+      - ROMA_PORT=7662
+
+    # Loopback-only publish: the host-network app reaches it at 127.0.0.1:7662, no external interface.
+    ports:
+      - "127.0.0.1:7662:7662"
+
+    # The python image has no curl, so the check uses urllib. start_period covers the
+    # model load + weights warm-up.
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:7662/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 180s
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "10"
