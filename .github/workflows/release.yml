@@ -65,5 +65,5 @@ jobs:
           VERSION: ${{ steps.payload.outputs.version }}
         run: |
           set -euo pipefail
-          ./update-version.sh set "${VERSION}"
+          # release.sh runs `update-version.sh set` internally before committing/tagging.
           ./release.sh "${VERSION}" -m "release: v${VERSION}"

@@ -9,7 +9,9 @@ set -euo pipefail
 
 VERSION="0.1.0"
 MODELS_DIR="/var/docker/data/roma-matcher/models"
-WEIGHTS_REF="docker.modelingevolution.com/roma-matcher/weights:${VERSION}"
+# Stable, model-versioned weights tag — reused across service releases; bump only if the
+# actual weight files change. The pull is SHA-256-verified below regardless.
+WEIGHTS_REF="docker.modelingevolution.com/roma-matcher/weights:v1"
 
 # filename  sha256  (computed from the canonical weight files)
 ROMA_FILE="roma_outdoor.pth"

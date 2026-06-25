@@ -117,12 +117,13 @@ it never deletes the weights.
 
 ### One-time weights push
 
-Publish the weights artifact once per release tag (re-tagging is a cheap digest copy when the weights
-are unchanged):
+The weights use a single stable, model-versioned tag (`weights:v1`) reused across service releases —
+push it **once**, and bump the `v<N>` only if the actual weight files change. The up-hook
+SHA-256-verifies every pull, so the tag carries no integrity role.
 
 ```bash
 cd ~/.cache/torch/hub/checkpoints      # holds roma_outdoor.pth + dinov2_vitl14_pretrain.pth
-oras push docker.modelingevolution.com/roma-matcher/weights:0.1.0 \
+oras push docker.modelingevolution.com/roma-matcher/weights:v1 \
   roma_outdoor.pth:application/octet-stream \
   dinov2_vitl14_pretrain.pth:application/octet-stream
 ```
