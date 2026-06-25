@@ -8,7 +8,7 @@ name: roma-matcher
 #
 # `docker compose config` validates on any host; `up` needs an NVIDIA-GPU host with the
 # container runtime registered (the service sets `runtime: nvidia`). Weights (~1.6 GB) are
-# provisioned once per device by up-<ver>.sh into /var/docker/data/roma-matcher/models.
+# baked into the image — no host weights dir, no runtime provisioning.
 
 services:
   roma-matcher:
@@ -26,9 +26,6 @@ services:
       - ROMA_DEVICE=cuda
       - ROMA_HOST=0.0.0.0
       - ROMA_PORT=7662
-
-    volumes:
-      - /var/docker/data/roma-matcher/models:/models
 
     # Loopback-only publish: the host-network app reaches it at 127.0.0.1:7662, no external interface.
     ports:
