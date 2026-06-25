@@ -1,12 +1,12 @@
 #!/bin/bash
-# Rollback down-0.1.0 — undo up-0.1.0.
+# Rollback down-1.0.0 — undo up-1.0.0.
 #
 # Removes the models directory only if it is empty. It never deletes weights: the ~1.6 GB
 # artifacts are expensive to re-fetch and shared by every version of this package.
 
 set -euo pipefail
 
-VERSION="0.1.0"
+VERSION="1.0.0"
 MODELS_DIR="/var/docker/data/roma-matcher/models"
 
 echo "Running down-${VERSION} — RoMa matcher rollback..."

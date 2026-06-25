@@ -1,5 +1,5 @@
 #!/bin/bash
-# Migration up-0.1.0 — provision the RoMa matcher weights on the device.
+# Migration up-1.0.0 — provision the RoMa matcher weights on the device.
 #
 # Idempotent: fetches the two weight files only if missing or checksum-mismatched, then
 # SHA-256-verifies them. The data dir persists across updates; weights are never baked into
@@ -7,7 +7,7 @@
 
 set -euo pipefail
 
-VERSION="0.1.0"
+VERSION="1.0.0"
 MODELS_DIR="/var/docker/data/roma-matcher/models"
 # Stable, model-versioned weights tag — reused across service releases; bump only if the
 # actual weight files change. The pull is SHA-256-verified below regardless.
