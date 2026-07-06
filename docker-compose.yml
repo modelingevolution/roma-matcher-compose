@@ -26,6 +26,18 @@ services:
       - ROMA_DEVICE=cuda
       - ROMA_HOST=0.0.0.0
       - ROMA_PORT=7662
+      # Per-device tuning (F008 design §7): each knob reads from a gitignored /data/roma-matcher/.env
+      # (Compose loads ./.env for ${VAR} substitution); `:-default` keeps the fleet default when the
+      # var is absent, so an untuned device behaves exactly as before. AutoUpdater's `git checkout`
+      # never deletes untracked files, so a device-local .env survives updates.
+      - ROMA_BG_ALIGN_MODEL=${ROMA_BG_ALIGN_MODEL:-affine}
+      - ROMA_BG_ALIGN_MAX_ITERS=${ROMA_BG_ALIGN_MAX_ITERS:-4}
+      - ROMA_BG_ALIGN_MAX_SHIFT=${ROMA_BG_ALIGN_MAX_SHIFT:-30}
+      - ROMA_BG_THRESHOLD=${ROMA_BG_THRESHOLD:-0}
+      - ROMA_BG_MORPH_OPEN=${ROMA_BG_MORPH_OPEN:-5}
+      - ROMA_BG_MORPH_CLOSE=${ROMA_BG_MORPH_CLOSE:-25}
+      - ROMA_BG_MASK_MARGIN_PX=${ROMA_BG_MASK_MARGIN_PX:-0}
+      - ROMA_FEATURE_CACHE_SIZE=${ROMA_FEATURE_CACHE_SIZE:-0}
 
     # Loopback-only publish: the host-network app reaches it at 127.0.0.1:7662, no external interface.
     ports:
