@@ -37,6 +37,9 @@ services:
       - ROMA_BG_MORPH_OPEN=${ROMA_BG_MORPH_OPEN:-5}
       - ROMA_BG_MORPH_CLOSE=${ROMA_BG_MORPH_CLOSE:-25}
       - ROMA_BG_MASK_MARGIN_PX=${ROMA_BG_MASK_MARGIN_PX:-0}
+      # Coverage safety cap: if a masked frame's foreground exceeds this fraction the reference failed
+      # to isolate the part, so the request falls back to crop mode (per-device tunable).
+      - ROMA_BG_MAX_MASK_COVERAGE=${ROMA_BG_MAX_MASK_COVERAGE:-0.85}
       - ROMA_FEATURE_CACHE_SIZE=${ROMA_FEATURE_CACHE_SIZE:-0}
       # Per-run /match debug dump (inputs, masks, padded frames, result.json) for operator
       # inspection of background removal. Lands in the host volume below; keep bounds retention.
