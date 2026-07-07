@@ -18,7 +18,6 @@ pre-built multi-arch image — it never builds.
 | `roma-matcher.version` | Bare semver of the pinned release. |
 | `update-version.sh` | `set X.Y.Z` pins the image tag across base + overrides and writes the version file; `list` queries Harbor for available release tags. |
 | `release.sh` | Pins the version, commits + pushes master, then creates + pushes the git tag AutoUpdater detects. |
-| `.github/workflows/release.yml` | `repository_dispatch: promote-release` → runs `update-version.sh set` + `release.sh`. |
 
 ## Service contract
 
@@ -66,37 +65,33 @@ per-device provisioning step.
 
 ## Release flow
 
-CI on `roma-matcher` builds the image on every master push. A single manual **promote** then cascades to
-the device — stages 3–4 are automatic.
+CI on `roma-matcher` builds the image on every master push. A manual **promote** publishes the release
+image; a developer then releases this repo.
 
 | # | Stage | Trigger | Produces |
 |---|---|---|---|
 | 1 | CI build | push to `roma-matcher` master | `latest` + `master-<sha>` multi-arch manifest on Harbor |
 | 2 | Promote | manual `workflow_dispatch` on `roma-matcher` | release manifest `roma-matcher:X.Y.Z` (digest re-tag) |
-| 3 | Compose release | promote dispatches **this repo** | version bump committed + pushed to master, then a git tag |
+| 3 | Compose release | developer runs `Deployments/app/release-roma-matcher.sh X.Y.Z` | version bump committed + pushed to master, then a git tag |
 | 4 | Deploy | AutoUpdater detects the new tag | `pull` → `down` → `up -d` (weights ship in the image) |
 
-### Dispatch contract
+Stage 3 runs on a developer machine, not in CI: this repo is public and the org self-hosted runner
+group does not serve public repositories, so the release cannot run on the `hyperion` runner.
+`Deployments/app/release-roma-matcher.sh` verifies `roma-matcher:X.Y.Z` exists on Harbor (refusing to
+tag a release with no image), then runs `update-version.sh set X.Y.Z` and `release.sh`; the pushed git
+tag is what AutoUpdater detects.
 
-`roma-matcher`'s `promote.yml` POSTs to this repo's `/dispatches`:
-
-```
-event_type: promote-release
-client_payload: { "version": "X.Y.Z" }
-```
-
-`release.yml` validates the version, confirms `roma-matcher:X.Y.Z` exists on Harbor (refusing to tag a
-release with no image), then runs `update-version.sh set X.Y.Z` and `release.sh`. It uses the default
-`GITHUB_TOKEN` (`contents: write`) to push to its own repo, and `HARBOR_USERNAME`/`HARBOR_PASSWORD`
-secrets for the Harbor check. The pushed git tag is what AutoUpdater detects.
-
-### Manual release
+### Running the release
 
 ```bash
+# Verifies Harbor, then pins + commits + tags + pushes this repo:
 HARBOR_USERNAME='robot$roma-matcher+deploy-pull' HARBOR_PASSWORD='<secret>' \
-  ./update-version.sh list          # see available release tags on Harbor
-./release.sh 0.2.0                   # pin 0.2.0, commit + push master, push tag v0.2.0
-./release.sh --dry-run               # preview without changing anything
+  Deployments/app/release-roma-matcher.sh 0.2.0
+
+# Or drive this repo's scripts directly:
+HARBOR_USERNAME=... HARBOR_PASSWORD=... ./update-version.sh list   # available release tags on Harbor
+./release.sh 0.2.0                                                 # pin 0.2.0, commit + push master, tag v0.2.0
+./release.sh --dry-run                                            # preview without changing anything
 ```
 
 ## Weights
