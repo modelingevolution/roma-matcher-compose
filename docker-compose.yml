@@ -37,11 +37,23 @@ services:
       - ROMA_BG_MORPH_OPEN=${ROMA_BG_MORPH_OPEN:-5}
       - ROMA_BG_MORPH_CLOSE=${ROMA_BG_MORPH_CLOSE:-25}
       - ROMA_BG_MASK_MARGIN_PX=${ROMA_BG_MASK_MARGIN_PX:-0}
+      # Coverage safety cap: if a masked frame's foreground exceeds this fraction the reference failed
+      # to isolate the part, so the request falls back to crop mode (per-device tunable).
+      - ROMA_BG_MAX_MASK_COVERAGE=${ROMA_BG_MAX_MASK_COVERAGE:-0.85}
       - ROMA_FEATURE_CACHE_SIZE=${ROMA_FEATURE_CACHE_SIZE:-0}
+      # Per-run /match debug dump (inputs, masks, padded frames, result.json) for operator
+      # inspection of background removal. Lands in the host volume below; keep bounds retention.
+      # Set ROMA_DEBUG_DUMP_DIR="" in the device .env to disable (zero overhead).
+      - ROMA_DEBUG_DUMP_DIR=${ROMA_DEBUG_DUMP_DIR:-/data/match-dumps}
+      - ROMA_DEBUG_DUMP_KEEP=${ROMA_DEBUG_DUMP_KEEP:-7}
 
     # Loopback-only publish: the host-network app reaches it at 127.0.0.1:7662, no external interface.
     ports:
       - "127.0.0.1:7662:7662"
+
+    # Debug dumps land on the host so an operator can browse them (deployment data-mount convention).
+    volumes:
+      - /var/docker/data/roma-matcher/match-dumps:/data/match-dumps
 
     # The python image has no curl, so the check uses urllib. start_period covers the
     # model load + weights warm-up.
