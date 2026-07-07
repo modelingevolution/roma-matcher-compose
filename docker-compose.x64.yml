@@ -4,5 +4,5 @@
 
 services:
   roma-matcher:
-    image: docker.modelingevolution.com/roma-matcher/roma-matcher:1.1.0
+    image: docker.modelingevolution.com/roma-matcher/roma-matcher:1.2.0
     platform: linux/amd64
