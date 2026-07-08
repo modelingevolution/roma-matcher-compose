@@ -12,7 +12,7 @@ name: roma-matcher
 
 services:
   roma-matcher:
-    image: docker.modelingevolution.com/roma-matcher/roma-matcher:1.2.0
+    image: docker.modelingevolution.com/roma-matcher/roma-matcher:1.2.1
     container_name: roma-matcher
     restart: unless-stopped
 
