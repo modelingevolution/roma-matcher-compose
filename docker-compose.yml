@@ -12,7 +12,7 @@ name: roma-matcher
 
 services:
   roma-matcher:
-    image: docker.modelingevolution.com/roma-matcher/roma-matcher:1.4.0
+    image: docker.modelingevolution.com/roma-matcher/roma-matcher:1.5.0
     container_name: roma-matcher
     restart: unless-stopped
 
@@ -41,6 +41,9 @@ services:
       # to isolate the part, so the request falls back to crop mode (per-device tunable).
       - ROMA_BG_MAX_MASK_COVERAGE=${ROMA_BG_MAX_MASK_COVERAGE:-0.85}
       - ROMA_FEATURE_CACHE_SIZE=${ROMA_FEATURE_CACHE_SIZE:-0}
+      # Circle mode: refine the rim-fit center by aligning the disc's edge image (epic-123 E-10).
+      # Set false in the device .env to fall back to the plain rim-fit center.
+      - ROMA_CIRCLE_AREA_REFINE=${ROMA_CIRCLE_AREA_REFINE:-true}
       # Per-run /match debug dump (inputs, masks, padded frames, result.json) for operator
       # inspection of background removal. Lands in the host volume below; keep bounds retention.
       # Set ROMA_DEBUG_DUMP_DIR="" in the device .env to disable (zero overhead).
