@@ -44,6 +44,10 @@ services:
       # Circle mode: refine the rim-fit center by aligning the disc's edge image (epic-123 E-10).
       # Set false in the device .env to fall back to the plain rim-fit center.
       - ROMA_CIRCLE_AREA_REFINE=${ROMA_CIRCLE_AREA_REFINE:-true}
+      # Kill switches for the corner (epic-125) and lines (epic-134) anchors: false in the device .env makes the
+      # snap route answer 503 and the /match part a 422, without a redeploy (ADR-134-11).
+      - ROMA_CORNER_ENABLE=${ROMA_CORNER_ENABLE:-true}
+      - ROMA_LINES_ENABLE=${ROMA_LINES_ENABLE:-true}
       # Per-run /match debug dump (inputs, masks, padded frames, result.json) for operator
       # inspection of background removal. Lands in the host volume below; keep bounds retention.
       # Set ROMA_DEBUG_DUMP_DIR="" in the device .env to disable (zero overhead).
